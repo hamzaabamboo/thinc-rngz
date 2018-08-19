@@ -1,10 +1,10 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import Home from '@/modules/home';
-import Add from '@/modules/add';
-import Remote from '@/modules/remote';
-import Login from '@/modules/login';
-import Control from '@/modules/control';
+import Home from '@/modules/home/index.vue';
+import Add from '@/modules/add/index.vue';
+import Remote from '@/modules/remote/index.vue';
+import Login from '@/modules/login/index.vue';
+import Control from '@/modules/control/index.vue';
 
 Vue.use(Router);
 
