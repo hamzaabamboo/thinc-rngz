@@ -11,15 +11,32 @@ section.hero.is-fullheight.thinc-bg
       div.column.white.is-pull-left
         | fname : Krist
         | lname : Pornpairin dw wer e rt
+    ul(v-for="member in members")
+      li {{ member }}
+
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import { db } from '@/common/firebase';
 
 @Component({
   components: {}
 })
-export default class Home extends Vue {}
+export default class Home extends Vue {
+  members: string[] = ['Loading...'];
+
+  mounted() {
+    db.collection('members').onSnapshot(snapshot => {
+      const newMembers: string[] = [];
+      snapshot.forEach(doc => {
+        newMembers.push(doc.data().name);
+      });
+
+      this.members = newMembers;
+    });
+  }
+}
 </script>
 
 <style>
