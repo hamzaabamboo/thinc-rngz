@@ -4,28 +4,26 @@ section.hero.is-fullheight.thinc-bg
     div(style='height: 15vh')
     img.thinc-logo(src='@/assets/thinc_logo.png')
     div(style='height: 2em')
-    button.button.is-info.is-rounded.is-large.fb
+    button.button.is-info.is-rounded.is-large.fb(@click="handleLogin()" v-if="!isAuth")
       span.icon
         i.fa.fa-facebook
       span login with facebook
+    h3(v-else) You're logged in !
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { auth, provider } from '@/common/firebase';
+import { State, Getter, Action, Mutation, namespace } from 'vuex-class';
 @Component({
   components: {}
 })
 export default class Login extends Vue {
-  user: any = {};
+  @Getter('currentUser') user: any;
+  @Getter('isAuthenticated') isAuth: any;
+  @Action login: any;
 
-  login() {
-    auth()
-      .signInWithPopup(provider)
-      .then(({ user }) => {
-        this.user = user;
-        console.log(user);
-      });
+  handleLogin() {
+    this.login();
   }
 }
 </script>
