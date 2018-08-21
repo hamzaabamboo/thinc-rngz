@@ -12,11 +12,22 @@ section.hero.is-fullheight.thinc-bg
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-
+import { auth, provider } from '@/common/firebase';
 @Component({
   components: {}
 })
-export default class Login extends Vue {}
+export default class Login extends Vue {
+  user: any = {};
+
+  login() {
+    auth()
+      .signInWithPopup(provider)
+      .then(({ user }) => {
+        this.user = user;
+        console.log(user);
+      });
+  }
+}
 </script>
 
 <style>
