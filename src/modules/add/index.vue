@@ -24,6 +24,8 @@ import { db } from '@/common/firebase';
 export default class Add extends Vue {
   name: string = '';
   gender: string = 'male';
+  loading: boolean = false;
+  randomed: boolean = false;
   members: string[] = [];
   @Getter('isAuthenticated') isAuth: any;
 
@@ -33,26 +35,66 @@ export default class Add extends Vue {
 
   private fetchMembers(): void {
     db
+      .collection('status')
+      .doc('current')
+      .onSnapshot(doc => {
+        this.loading = true;
+        const { random } = doc.data() as any;
+        this.randomed = random;
+      });
+    db
       .collection('members')
       .get()
       .then(data => {
         this.members = data.docs.map(e => e.data().name);
       });
+    this.groupNo();
   }
-  private addMember(): void {
-    db
-      .collection('members')
-      .doc()
-      .set({
-        name: this.name,
-        gender: this.gender
-      })
-      .then(() => {
-        this.name = '';
-        this.fetchMembers();
+  private async addMember(): Promise<void> {
+    if (this.randomed) {
+      db
+        .collection('members')
+        .doc()
+        .set({
+          name: this.name,
+          gender: this.gender,
+          group: await this.groupNo()
+        })
+        .then(() => {
+          this.name = '';
+          this.fetchMembers();
+        });
+    } else {
+      db
+        .collection('members')
+        .doc()
+        .set({
+          name: this.name,
+          gender: this.gender
+        })
+        .then(() => {
+          this.name = '';
+          this.fetchMembers();
+        });
+    }
+  }
+  async groupNo(): Promise<any> {
+    const groupCount = Array(8).fill(0);
+    const docs = await db.collection('members').get();
+    return new Promise((resolve, reject) => {
+      docs.forEach(doc => {
+        groupCount[doc.data().group - 1] += 1;
       });
+      for (let i = 0; i < groupCount.length; i++) {
+        if (i == groupCount.length) continue;
+        else {
+          if (groupCount[i] > groupCount[i + 1]) {
+            resolve(i + 2);
+          }
+        }
+      }
+    });
   }
-
   private removeMember(): void {}
 }
 </script>
