@@ -2,9 +2,6 @@
   div(v-if="!loading")
     button( @click="goRandom()") Click to random !
     button( v-if="randomed" @click="reset()") Click to reset
-    ul(v-if="groups" v-for="(group, index) in groups")
-      li Group - {{ index + 1 }} 
-      li(v-for="member in group") {{ member.name }}
     ul(v-for="member in members")
       li {{ member.name }}
   div(v-else) Loading...
@@ -62,7 +59,12 @@ export default class Control extends Vue {
     for (let i = 0, j = 0; i < this.members.length; i++) {
       this.groups[j] = !this.groups[j] ? [] : this.groups[j];
       this.groups[j].push(this.members[i]);
-      j = j > 7 ? 0 : j + 1;
+      const { name, gender } = this.members[i];
+      db
+        .collection('members')
+        .doc(this.members[i].id)
+        .set({ name, gender, group: j + 1 });
+      j = j > 6 ? 0 : j + 1;
     }
     db
       .collection('status')
@@ -74,6 +76,16 @@ export default class Control extends Vue {
 
   public reset(): void {
     this.groups = [];
+    this.members.forEach(member => {
+      const { name, gender } = member;
+      db
+        .collection('members')
+        .doc(member.id)
+        .set({
+          name,
+          gender
+        });
+    });
     db
       .collection('status')
       .doc('current')
