@@ -32,7 +32,7 @@ export default class Home extends Vue {
     db.collection('members').onSnapshot(snapshot => {
       const newMembers: string[] = [];
       snapshot.forEach(doc => {
-        newMembers.push(doc.data().name);
+        newMembers.push(doc.data().name); //gender
       });
       console.log(newMembers);
       this.members = newMembers;
