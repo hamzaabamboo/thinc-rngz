@@ -6757,6 +6757,10 @@ vuex-class@^0.3.1:
   version "0.3.1"
   resolved "https://registry.yarnpkg.com/vuex-class/-/vuex-class-0.3.1.tgz#3c0b946bcff4cf2be1904de5b0cab1a3dd5c41d5"
 
+vuex-module-decorators@^0.3.1:
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/vuex-module-decorators/-/vuex-module-decorators-0.3.1.tgz#5038dbcc6b2508be20cd5c0f4794ea9a1bd3dda9"
+
 vuex@^3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/vuex/-/vuex-3.0.1.tgz#e761352ebe0af537d4bb755a9b9dc4be3df7efd2"
