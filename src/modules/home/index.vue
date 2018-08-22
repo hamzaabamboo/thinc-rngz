@@ -13,10 +13,12 @@ section.hero.is-fullheight.thinc-bg
         | lname : Pornpairin dw wer e rt
     ul(v-for="member in members")
       li {{ member }}
+    div {{grouping}}
 
 </template>
 
 <script lang="ts">
+import * as _ from 'lodash';
 import { Component, Vue } from 'vue-property-decorator';
 import { db } from '@/common/firebase';
 
@@ -32,9 +34,18 @@ export default class Home extends Vue {
       snapshot.forEach(doc => {
         newMembers.push(doc.data().name);
       });
-
+      console.log(newMembers);
       this.members = newMembers;
+      // this.grouping(8)
+      this.$forceUpdate();
     });
+  }
+  get grouping() : string[][] {
+    let result = _.map(Array(8), () => []);
+    for (let member of this.members || []) {
+      result[_.random(8)].push(member)
+    }
+    return result
   }
 }
 </script>
