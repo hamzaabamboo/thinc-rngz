@@ -5,7 +5,7 @@ service cloud.firestore {
       allow write : if exists(/databases/$(database)/documents/admins/$(request.auth.uid))
     }
 
-    match /status/{members} {
+    match /status/current {
       allow read;
       allow write : if exists(/databases/$(database)/documents/admins/$(request.auth.uid))
     }
