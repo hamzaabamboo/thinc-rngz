@@ -56,16 +56,20 @@ export default class Control extends Vue {
   public goRandom(): void {
     this.groups = [];
     this.members = shuffle(this.members);
+    const membersRef = db.collection('members');
+    const batch = db.batch();
     for (let i = 0, j = 0; i < this.members.length; i++) {
       this.groups[j] = !this.groups[j] ? [] : this.groups[j];
       this.groups[j].push(this.members[i]);
       const { name, gender } = this.members[i];
-      db
-        .collection('members')
-        .doc(this.members[i].id)
-        .set({ name, gender, group: j + 1 });
+      batch.set(membersRef.doc(this.members[i].id), {
+        name,
+        gender,
+        group: j + 1
+      });
       j = j > 6 ? 0 : j + 1;
     }
+    batch.commit();
     db
       .collection('status')
       .doc('current')
@@ -75,23 +79,23 @@ export default class Control extends Vue {
   }
 
   public reset(): void {
-    this.groups = [];
-    this.members.forEach(member => {
-      const { name, gender } = member;
-      db
-        .collection('members')
-        .doc(member.id)
-        .set({
-          name,
-          gender
-        });
-    });
     db
       .collection('status')
       .doc('current')
       .set({
         random: false
       });
+    this.groups = [];
+    const membersRef = db.collection('members');
+    const batch = db.batch();
+    this.members.forEach(member => {
+      const { name, gender } = member;
+      batch.set(membersRef.doc(member.id), {
+        name,
+        gender
+      });
+    });
+    batch.commit();
   }
 }
 </script>

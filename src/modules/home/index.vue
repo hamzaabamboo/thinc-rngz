@@ -35,6 +35,7 @@ export default class Home extends Vue {
   groups: string[][] = [];
 
   mounted() {
+    const membersRef = db.collection('members');
     db
       .collection('status')
       .doc('current')
@@ -43,23 +44,17 @@ export default class Home extends Vue {
         const { random } = doc.data() as any;
         this.randomed = random;
         if (random) {
-          db
-            .collection('members')
-            .get()
-            .then(docs => {
-              this.updateGroups(docs);
-              this.updateMembers(docs);
-              this.loading = false;
-              this.$forceUpdate();
-            });
+          membersRef.get().then(docs => {
+            this.updateGroups(docs);
+            this.updateMembers(docs);
+            this.loading = false;
+            this.$forceUpdate();
+          });
         } else {
-          db
-            .collection('members')
-            .get()
-            .then(docs => {
-              this.updateMembers(docs);
-              this.loading = false;
-            });
+          membersRef.get().then(docs => {
+            this.updateMembers(docs);
+            this.loading = false;
+          });
         }
         this.loading = false;
       });
