@@ -26,7 +26,11 @@ const actions = {
       });
   },
   [LOGOUT](context) {
-    context.commit(PURGE_AUTH);
+    auth()
+      .signOut()
+      .then(() => {
+        context.commit(PURGE_AUTH);
+      });
   }
 };
 

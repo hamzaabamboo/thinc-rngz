@@ -7,6 +7,22 @@ section.hero.is-fullheight.thinc-bg
       div.column.is-one-quarter(v-for='grp in grouping') 
         ul.box
           li.is-size-5(v-for='m in grp') {{m.name}}
+    div(style='height: 3em')
+
+    div(v-if = "loading") Loading...
+    div(v-else)
+      div.column.figure.square.image
+        img.is-rounded(src="https://scontent.fbkk5-8.fna.fbcdn.net/v/t1.0-9/27973655_1682647955130051_2651645178200390804_n.jpg?_nc_cat=0&_nc_eui2=AeELNwn8ksGaurog36CAb85Uy1KB0DszN3phZ8FJa9jJlL-sWBQIMQgm1Dxnhf5G-otEreccpzKpsEmTpI2uWryaZiWM8j9HG_1ynfOoFkKoog&oh=fa5ef47d2206f090fac27684d92b8386&oe=5C0099CC")
+      div(style='height: 3rem')
+      div.column.white.is-pull-left
+        | fname : Krist
+        | lname : Pornpairin dw wer e rt
+      div(v-if="randomed")
+        ul(v-for="(group, index) in groups")
+          li Group - {{ index + 1 }} 
+          li(v-for="member in group") {{ member }}
+      ul(v-else)
+        li(v-for="member in members") {{ member }}
 
 </template>
 
@@ -19,20 +35,61 @@ import { grouping } from './grouping';
   components: {}
 })
 export default class Home extends Vue {
-  protected members: any[] = ['Loading...'];
+  public members: any[] = ['Loading...'];
+  public loading: boolean = true;
+  public randomed: boolean = false;
+  public groups: string[][] = [];
 
   public mounted() {
-    db.collection('members').onSnapshot((snapshot) => {
-      const newMembers: any[] = [];
-      snapshot.forEach((doc) => {
-        newMembers.push(doc.data());
+    const membersRef = db.collection('members');
+    db
+      .collection('status')
+      .doc('current')
+      .onSnapshot(doc => {
+        this.loading = true;
+        const { random } = doc.data() as any;
+        this.randomed = random;
+        if (random) {
+          membersRef.get().then(docs => {
+            this.updateGroups(docs);
+            this.updateMembers(docs);
+            this.loading = false;
+            this.$forceUpdate();
+          });
+        } else {
+          membersRef.get().then(docs => {
+            this.updateMembers(docs);
+            this.loading = false;
+          });
+        }
+        this.loading = false;
       });
-      this.members = newMembers;
+    db.collection('members').onSnapshot(docs => {
+      if (this.randomed) {
+        this.updateGroups(docs);
+        this.updateMembers(docs);
+      }
+    });
+  }
+  private updateGroups(docs: firebase.firestore.QuerySnapshot): void {
+    this.groups = Array(8)
+      .fill(undefined)
+      .map(() => []);
+    docs.forEach(doc => {
+      const { name, group } = doc.data() as any;
+      this.randomed && group && this.groups[group - 1].push(name);
     });
     this.$forceUpdate();
   }
-  get grouping(): any {
+  private get grouping(): any {
     return grouping(this.members);
+  }
+  private updateMembers(docs: firebase.firestore.QuerySnapshot): void {
+    const newMembers: string[] = [];
+    docs.forEach(doc => {
+      newMembers.push(doc.data().name);
+    });
+    this.members = newMembers;
   }
 }
 </script>

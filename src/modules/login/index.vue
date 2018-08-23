@@ -20,9 +20,9 @@ import { State, Getter, Action, Mutation, namespace } from 'vuex-class';
 export default class Login extends Vue {
   @Getter('currentUser') user: any;
   @Getter('isAuthenticated') isAuth: any;
-  @Action login: any;
+  @Action public login: any;
 
-  handleLogin() {
+  private handleLogin(): void {
     this.login();
   }
 }
