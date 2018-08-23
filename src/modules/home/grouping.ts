@@ -1,17 +1,12 @@
+import _ from 'lodash';
 interface Member {
     name: string;
     gender: string;
 }
-import _ from 'lodash';
-function grouping(members: Member[]): any {
-    let res = [[], [], [], [], [], [], [], []];
-    for (let x in members) {
-        // console.log(x);
-        res[x % 8].push(members[x]);
-        
-    }
-    console.log(res)
-    return res
+export function grouping(members: Member[]): Member[][] {
+    const groups: Member[][] = Array(8).fill(undefined).map(() => []);
+    _.shuffle(members).forEach((member: Member, idx: number) => {
+        groups[idx % 8].push(member);
+    });
+    return _.shuffle(groups);
 }
-
-export { grouping };

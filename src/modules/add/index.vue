@@ -5,7 +5,7 @@ section.hero.is-fullheight.thinc-bg
     div(style='height: 3rem')
     div(v-if="isAuth" align='center')
       div.field.is-grouped(style='justify-content: center')
-        p.control: input.input.is-inline(v-model="name" placeholder='name')
+        p.control: input.input.is-inline(v-model="name" placeholder='name' maxLength='15')
         p.control.select
           select(v-model="gender")
             option(value="male") Male
@@ -26,14 +26,14 @@ import { db } from '@/common/firebase';
   components: {}
 })
 export default class Add extends Vue {
-  name: string = '';
-  gender: string = 'male';
-  loading: boolean = false;
-  randomed: boolean = false;
-  members: string[] = [];
-  @Getter('isAuthenticated') isAuth: any;
+  @Getter('isAuthenticated') public isAuth: any;
+  private name: string = '';
+  private gender: string = 'male';
+  private loading: boolean = false;
+  private randomed: boolean = false;
+  private members: string[] = [];
 
-  mounted() {
+  public mounted() {
     this.fetchMembers();
   }
 
@@ -52,7 +52,7 @@ export default class Add extends Vue {
       .then(data => {
         this.members = data.docs.map(e => e.data().name);
       });
-    this.groupNo();
+    // this.groupNo();
   }
   private async addMember(): Promise<void> {
     if (this.randomed) {
@@ -82,7 +82,7 @@ export default class Add extends Vue {
         });
     }
   }
-  async groupNo(): Promise<any> {
+  private async groupNo(): Promise<any> {
     const groupCount = Array(8).fill(0);
     const docs = await db.collection('members').get();
     return new Promise((resolve, reject) => {
@@ -90,8 +90,9 @@ export default class Add extends Vue {
         groupCount[doc.data().group - 1] += 1;
       });
       for (let i = 0; i < groupCount.length; i++) {
-        if (i == groupCount.length) continue;
-        else {
+        if (i === groupCount.length) {
+          continue;
+        } else {
           if (groupCount[i] > groupCount[i + 1]) {
             resolve(i + 2);
           }
@@ -99,7 +100,7 @@ export default class Add extends Vue {
       }
     });
   }
-  private removeMember(): void {}
+  // private removeMember(): void {}
 }
 </script>
 

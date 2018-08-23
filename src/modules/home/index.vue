@@ -3,26 +3,18 @@ section.hero.is-fullheight.thinc-bg
   div.section.center
     img.thinc-logo.is-small(src='@/assets/thinc_logo.png')
     div(style='height: 4em')
-    div.columns.is-multiline
-      div.column.is-one-quarter(v-for='grp in grouping') 
+    div(v-if="loading") Loading...
+    div(v-else-if="randomed").columns.is-multiline
+      div.column.is-one-quarter(v-for='(grp, grpID) in groups') 
         ul.box
-          li.is-size-5(v-for='m in grp') {{m.name}}
-    div(style='height: 3em')
-
-    div(v-if = "loading") Loading...
+          h1.pop-title {{grpID + 1}}
+          li.is-size-5(
+            v-for='member in grp' 
+            :style='{color: member.gender == "male" ? "green" : "red"}'
+          ) {{member.name}}
     div(v-else)
-      div.column.figure.square.image
-        img.is-rounded(src="https://scontent.fbkk5-8.fna.fbcdn.net/v/t1.0-9/27973655_1682647955130051_2651645178200390804_n.jpg?_nc_cat=0&_nc_eui2=AeELNwn8ksGaurog36CAb85Uy1KB0DszN3phZ8FJa9jJlL-sWBQIMQgm1Dxnhf5G-otEreccpzKpsEmTpI2uWryaZiWM8j9HG_1ynfOoFkKoog&oh=fa5ef47d2206f090fac27684d92b8386&oe=5C0099CC")
-      div(style='height: 3rem')
-      div.column.white.is-pull-left
-        | fname : Krist
-        | lname : Pornpairin dw wer e rt
-      div(v-if="randomed")
-        ul(v-for="(group, index) in groups")
-          li Group - {{ index + 1 }} 
-          li(v-for="member in group") {{ member }}
-      ul(v-else)
-        li(v-for="member in members") {{ member }}
+      div.tags
+        div.tag.is-size-6(v-for='member in members') {{member.name}}
 
 </template>
 
@@ -31,16 +23,22 @@ import * as _ from 'lodash';
 import { Component, Vue } from 'vue-property-decorator';
 import { db } from '@/common/firebase';
 import { grouping } from './grouping';
+
+interface Member {
+    name: string;
+    gender: string;
+}
 @Component({
   components: {}
 })
 export default class Home extends Vue {
-  public members: any[] = ['Loading...'];
+  public members: Member[] = [];
   public loading: boolean = true;
   public randomed: boolean = false;
-  public groups: string[][] = [];
+  public groups: any[][] = [];
 
   public mounted() {
+    console.log('/home mounted');
     const membersRef = db.collection('members');
     db
       .collection('status')
@@ -72,22 +70,32 @@ export default class Home extends Vue {
     });
   }
   private updateGroups(docs: firebase.firestore.QuerySnapshot): void {
-    this.groups = Array(8)
-      .fill(undefined)
-      .map(() => []);
-    docs.forEach(doc => {
-      const { name, group } = doc.data() as any;
-      this.randomed && group && this.groups[group - 1].push(name);
+    const docsList: Member[] = [];
+    docs.forEach((doc: any) => {
+      docsList.push(doc.data());
     });
+    console.log(docsList);
+    this.groups = grouping(docsList);
+    // console.log(docs)
+    // this.groups = Array(8)
+    //   .fill(undefined)
+    //   .map(() => []);
+    // docs.forEach(doc => {
+    //   console.log('updateGroup', doc.data());
+    //   const { name, group } = doc.data() as any;
+    //   if (this.randomed && group) {
+    //     this.groups[group - 1].push(name);
+    //   }
+    // });
     this.$forceUpdate();
   }
-  private get grouping(): any {
+  private get grouping(): Member[][] {
     return grouping(this.members);
   }
   private updateMembers(docs: firebase.firestore.QuerySnapshot): void {
-    const newMembers: string[] = [];
+    const newMembers: any[] = [];
     docs.forEach(doc => {
-      newMembers.push(doc.data().name);
+      newMembers.push(doc.data());
     });
     this.members = newMembers;
   }
@@ -106,5 +114,17 @@ export default class Home extends Vue {
   display: flex;
   flex-direction: column;
 }
-
+.pop-title {
+  position: absolute;
+  background-color: rgb(255, 255, 255);
+  border-radius: 10000px;
+  font-size: 2rem;
+  width: 50px;
+  margin: -3.5rem auto 0 0px;
+  box-shadow: 2px 2px 10px #222;
+}
+.box {
+  margin-top: 3rem;
+  padding-top: 2rem !important;
+}
 </style>
