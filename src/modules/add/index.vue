@@ -1,16 +1,20 @@
 <template lang="pug">
-  div
-    h1 This is add page
-    div(v-if="isAuth")
-      input(v-model="name")
-      button(@click="addMember") Add
-      select(v-model="gender")
-        option(value="male") Male
-        option(vaule="female") Female
-    div(v-else)
-      span You're not logged in
-    ul
-      li(v-for="member in members") {{ member }}
+section.hero.is-fullheight.thinc-bg
+  div.section.center
+    img.thinc-logo.is-small(src='@/assets/thinc_logo.png')
+    div(style='height: 3rem')
+    div(v-if="isAuth" align='center')
+      div.field.is-grouped(style='justify-content: center')
+        p.control: input.input.is-inline(v-model="name" placeholder='name')
+        p.control.select
+          select(v-model="gender")
+            option(value="male") Male
+            option(vaule="female") Female
+        p.control: button.button.is-success(@click="addMember") Add
+    div(v-else) You're not logged in
+    div(style='height: 3rem')
+    div.tags
+      div.tag.is-size-6(v-for="member in members") {{ member }}
 </template>
 
 <script lang="ts">
@@ -56,3 +60,9 @@ export default class Add extends Vue {
   private removeMember(): void {}
 }
 </script>
+
+<style scoped>
+.section {
+  max-width: 800px;
+}
+</style>

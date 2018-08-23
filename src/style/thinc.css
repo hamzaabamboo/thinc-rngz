@@ -23,21 +23,21 @@
 .thinc-bg {
     background-color: #222;
 }
-.thinc-bg::before {
+/* .thinc-bg::before {
     content: '';
     position: absolute;
     height: 100vh;
     width: 100vw;
-    z-index: 0;
+    z-index: 0; */
     /* background-image: url(../assets/circuit_bg.png); */
-    background-size: cover;
+    /* background-size: cover; */
     /* -webkit-filter: blur(5px);
     -moz-filter: blur(5px);
     -o-filter: blur(5px);
     -ms-filter: blur(5px); */
     /* filter: blur(5px); */
     /* background-image: linear-gradient(to bottom right, rgb(49, 40, 49), rgb(68, 70, 60)); */
-}
+/* } */
 .white {
     color: #eee;
 }
